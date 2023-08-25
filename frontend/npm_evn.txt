@@ -1,0 +1,6 @@
+npm install react-router-dom
+npm install redux redux-devtools-extension react-redux redux-thunk
+npm install -D tailwindcss
+npx tailwindcss init
+npm i @headlessui/react @heroicons/react
+npm i @material-tailwind/react
