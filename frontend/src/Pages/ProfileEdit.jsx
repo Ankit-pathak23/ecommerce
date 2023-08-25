@@ -36,7 +36,7 @@ export default function ProfileEdit() {
 
  const [email,setEmail] = useState(userInfo.email)
  const [password,setPassword] = useState('')
- const [phone,setPhone] = useState(userDetails.profile.phone)
+ const [phone,setPhone] = useState(userDetails.phone)
  
  const redirect = Location.search ? Location.search.split('=')[1] : '/'
 
@@ -79,7 +79,7 @@ useEffect(() => {
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base font-semibold leading-7 text-gray-900">Profile</h2>
           <div className="mt-2 flex items-center gap-x-3">
-        <img src={userDetails.profile.image} className='h-12 w-12 rounded-full'></img>
+        <img src={userDetails.image} className='h-12 w-12 rounded-full'></img>
         </div>
 
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
