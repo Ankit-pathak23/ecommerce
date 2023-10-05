@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from base.models import CustomUser as User
+from base.models import CustomUser as User,Order
 from rest_framework.authentication import TokenAuthentication
-from base.serializer import ProductSerializer,UserSerializer,UserSerializerWithToken,ShippingAddressSerializer
+from base.serializer import ProductSerializer,UserSerializer,UserSerializerWithToken,ShippingAddressSerializer,OrderSerializer
 from rest_framework.decorators import api_view,permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated,IsAdminUser
+from rest_framework.permissions import IsAuthenticated,IsAdminUser,AllowAny
 from rest_framework.response import Response
 from typing import Any, Dict, Optional, Type, TypeVar
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -13,6 +13,7 @@ from base.models import ShippingAddress
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from base.email import send_otp_via_email
+import requests
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -27,6 +28,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer     
 
+
+
 @api_view(['POST'])
 def registerUser(request):
     data=request.data
@@ -38,6 +41,7 @@ def registerUser(request):
             email=data['email'],
             image=data['image'],
             phone=data['phone'],
+            username=data['email'],
             password=make_password(data['password'])
             
         )
@@ -49,7 +53,38 @@ def registerUser(request):
     except:
         message={'detail':'User with this email already exists'}
         return Response(message,status=status.HTTP_400_BAD_REQUEST)
+    
+    
+@api_view(['POST'])
+def googleregister(request):
+    data=request.data
+    print(data)
 
+    try:
+        user=User.objects.get(email=data['email'])
+        user.isVerified=True
+
+        serializer=UserSerializerWithToken(user,many=False)
+        print(serializer.data)
+        return Response(serializer.data)
+    except:
+        try:
+            user=User.objects.create(
+            first_name=data['name'],
+            email=data['email'],
+            imagegoogle=data['image'],
+            username=data['email'],
+            isverified=True,
+            password=make_password(data['email'])
+            )
+
+            serializer=UserSerializerWithToken(user,many=False)
+           
+            return Response(serializer.data)
+
+        except:
+            message={'detail':'User with this email already exists'}
+            return Response(message,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def resendOTP(request):
@@ -195,3 +230,52 @@ def createShippingAddress(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Allow unauthenticated access
+def google_login(request):
+    # Get user details from the request (assuming JSON data)
+    access_token = request.data.get('access_token')
+    email = request.data.get('email')
+    # Other user details you might need
+
+    # Verify the Google access token (using Google API or other libraries)
+    # If verification is successful:
+    # Check if the user already exists in the database
+    try:
+        user = User.objects.get(username=email)
+        seralizer=user
+        # Update the user's information if needed
+        # ...
+    except User.DoesNotExist:
+        # Create a new user with the provided details
+        user = User.objects.create_user(username=email, email=email)
+        # ...
+    
+    # Perform any additional authentication/logic if needed
+
+    # Return a response to the frontend
+    return Response({'message': 'Google login successful', 'user_id': user.id})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_orders(request):
+    try:
+        # Check if the logged-in user is the same as the requested user_id
+        user = request.user
+
+        # Retrieve the user's orders
+        orders = Order.objects.filter(user=user)
+
+        if orders.exists():
+            # Serialize the orders
+            serializer = OrderSerializer(orders, many=True)
+            return Response(serializer.data)
+        else:
+            # No orders found for the user
+            return Response({'detail': 'No orders found for this user.'}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        # Handle any other unexpected exceptions or errors
+        print(e)
+        return Response({'detail': 'An error occurred while processing your request.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useParams } from "react-router-dom"
-import { getOrderDetails } from "../redux/Slice/OrderSlice"
+// import { getOrderDetails } from "../redux/Slice/OrderSlice"
 
 /*
   This example requires Tailwind CSS v2.0+ 
@@ -104,19 +104,20 @@ const products = [
                         <dt className="font-medium text-gray-900">Delivery address</dt>
                         <dd className="mt-3 text-gray-500">
                           <span className="block">{product.shippingAddress}</span>
-                          {/* <span className="block">{product.address[1]}</span>
-                          <span className="block">{product.address[2]}</span> */}
+                          <span className="block">{orderDetails.shippingAddress.address}</span>
+                          <span className="block">{orderDetails.shippingAddress.city}</span>
+                          <span className="block">{orderDetails.shippingAddress.country}</span>
                         </dd>
                       </div>
                       <div>
-                        <dt className="font-medium text-gray-900">Shipping updates</dt>
-                        <dd className="mt-3 text-gray-500 space-y-3">
+                        {/* <dt className="font-medium text-gray-900">Shipping updates</dt> */}
+                        {/* <dd className="mt-3 text-gray-500 space-y-3">
                           <p>{product.email}</p>
                           <p>{product.phone}</p>
                           <button type="button" className="font-medium text-indigo-600 hover:text-indigo-500">
                             Edit
                           </button>
-                        </dd>
+                        </dd> */}
                       </div>
                     </dl>
                     <p className="font-medium text-gray-900 mt-6 md:mt-10">
@@ -126,7 +127,7 @@ const products = [
                       <div className="bg-gray-200 rounded-full overflow-hidden">
                         <div
                           className="h-2 bg-indigo-600 rounded-full"
-                          style={{ width: `calc((${product.step} * 2 + 1) / 8 * 100%)` }}
+                          style={{ width: `calc((2 * 2 + 1) / 8 * 100%)` }}
                         />
                       </div>
                       <div className="hidden sm:grid grid-cols-4 font-medium text-gray-600 mt-6">
@@ -157,9 +158,9 @@ const products = [
                 <div>
                   <dt className="font-medium text-gray-900">Billing address</dt>
                   <dd className="mt-3 text-gray-500">
-                    <span className="block">Floyd Miles</span>
-                    <span className="block">7363 Cynthia Pass</span>
-                    <span className="block">Toronto, ON N3Y 4H8</span>
+                    <span className="block">{orderDetails.shippingAddress.address}</span>
+                    <span className="block">{orderDetails.shippingAddress.city}</span>
+                    <span className="block">{orderDetails.shippingAddress.country}</span>
                   </dd>
                 </div>
                 <div>
@@ -171,12 +172,12 @@ const products = [
                       
                   
                     </div>
-                    {orderDetails.paymentMethod != 'cash on delevery' &&
+                    {/* {orderDetails.paymentMethod != 'cash on delevery' &&
                     <div className="ml-4">
-                      <p className="text-gray-900">Ending with 4242</p>
-                      <p className="text-gray-600">Expires 02 / 24</p>
-                    </div>
-  }
+                      <p className="text-gray-900">RazorPay</p>
+                      
+                    </div> */}
+  
                   </dd>
                 </div>
               </dl>

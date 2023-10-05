@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 
 
@@ -47,15 +48,30 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.github',
+    # 'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.linkedin',
-    'allauth.socialaccount.providers.facebook',
+    # 'allauth.socialaccount.providers.linkedin',
+    # 'allauth.socialaccount.providers.facebook',
+    'oauth2_provider',
+    "razorpay_backend.apps.RazorpayBackendConfig",
+    
 
 
     
 
 ]
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google" : {
+        "SCOPE": {
+            "profile",
+            "email",
+        },
+        "AUTH_PARAMS":{"access_type":"online"}
+
+    }
+}
 
 REST_FRAMEWORK = {
     
@@ -183,6 +199,9 @@ AUTHENTICATION_BACKENDS = [
     
 ]
 
+LOGIN_REDIRECT_URL="/"
+LOGOUT_REDIRECT_URL="/"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -217,8 +236,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-SITE_ID = 1 
+SITE_ID = 1
+
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_UNIQUE_EMAIL = True
+# ACCOUNT_ADAPTER = 'base.adapters.CustomAccountAdapter'
 AUTH_USER_MODEL = 'base.CustomUser'
+
 
 
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
@@ -227,3 +252,10 @@ EMAIL_USE_TLS=True
 EMAIL_PORT= 587
 EMAIL_HOST_USER ='marketeshopplace@gmail.com'
 EMAIL_HOST_PASSWORD='tfytlmtksdlyuczg'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+RAZORPAY_KEY_ID = "rzp_test_0ZY6EjrHkFQgpY"
+RAZORPAY_KEY_SECRET = "1D9WkKS7t1QcSyn4qezp0rpA"

@@ -11,15 +11,19 @@ from .manager import UserManager
 
 
 class CustomUser(AbstractUser):
-    username=None
-    phone=models.CharField(max_length=30,null=True,blank=True,unique=True)
-    image=models.ImageField(upload_to='picture/%y/%m/%d/',max_length=255,blank=True)
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
+    phone=models.CharField(max_length=30,null=True,blank=True,unique=True,default='0000000000')
+    image=models.ImageField(null=True,blank=True,default='default_profile.jpg')
     email=models.EmailField(unique=True)
     isverified=models.BooleanField(default=False)
     otp=models.CharField(max_length=4,null=True,blank=True)
-    USERNAME_FIELD='email'
-    REQUIRED_FIELDS=[]
+    imagegoogle = models.URLField(default='https://www.example.com',null=True,blank=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
     objects=UserManager()
+
+    def __str__(self):
+        return self.username or self.email
 
 
 
@@ -41,6 +45,8 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    
 
 class SizeAvailable(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -90,6 +96,7 @@ class Order(models.Model):
     deliveredAt = models.DateTimeField(auto_now_add=False, null=True,blank=True )
     createdAt = models.DateTimeField(auto_now_add=True )
     address=models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL,null=True)
+    razorpay_order_id = models.CharField(max_length=255,null=True,blank=True)
     id = models.AutoField(primary_key=True,editable=False)
     
     
@@ -108,6 +115,5 @@ class OrderItem(models.Model):
     def __str__(self):
         return str(self.name)
     
-
 
 

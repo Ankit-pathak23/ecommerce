@@ -12,7 +12,7 @@
   }
   ```
 */
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import logo from '../../assects/eshoplogo.png'
@@ -29,7 +29,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { FaHome, FaUserAlt, FaShippingFast } from 'react-icons/fa'
 import { CiLogout } from 'react-icons/ci'
-import { logout } from '../../redux/Slice/UserSlice'
+import { getUserDetails, logout } from '../../redux/Slice/UserSlice'
 const navigation = {
   categories: [
     {
@@ -170,6 +170,11 @@ export default function Navbaar() {
   const cart=useSelector((state) =>  state.cart)
 
   const {cartItems} =cart;
+  useEffect(()=>{
+    if(userInfo){
+      dispatch(getUserDetails())
+    }
+  },[])
 
 
   const solutions = [
@@ -664,12 +669,8 @@ export default function Navbaar() {
 
                 {/* Search */}
                 <div className="flex lg:ml-6">
-                  {search ?
-                    <button onClick={serachBaarToggle} className="p-2 text-gray-400 hover:text-gray-500">
-                      <span className="sr-only">Search</span>
-                      <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-                    : <SearchBaar />}
+                 
+                     <SearchBaar />
                 </div>
 
                 {/* Cart */}

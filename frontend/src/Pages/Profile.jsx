@@ -23,6 +23,8 @@ export default function Profile() {
     const verifyaccount= () => {
       navigate('/profile/verify')
     }
+    const imageUrl= userDetails.image === '/images/default_profile.jpg' ? userDetails.imagegoogle : userDetails.image
+    console.log(imageUrl);
   return (
     <>
     {loading&&<Loader/>}
@@ -35,7 +37,7 @@ export default function Profile() {
       </div>
       <div className="mt-6 border-t border-gray-100">
       <div className="mt-2 flex items-center gap-x-3">
-        <img src={userDetails.image} className='h-20 w-20 rounded-full'></img>
+        <img src={imageUrl} className='h-20 w-20 rounded-full'></img>
         </div>
         <dl className="divide-y divide-gray-100">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 relative">
@@ -43,19 +45,20 @@ export default function Profile() {
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{userInfo.name}  </dd>
            
           </div>
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          
             {/* {!userDetails.length===0 && 
            <><dt className="text-sm font-medium leading-6 text-gray-900">Mobile Number</dt>
            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{userDetails.profile.phone} <Link to='/change/:id' className='absolute inset-y-0 right-0 w-16 cursor-pointer '> </Link></dd></> } */}
             
-          </div>
+          
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">Email address</dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{userInfo.email}  </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">Phone Number</dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{userDetails.phone}  </dd>
+            { userDetails.phone === '0000000000' ? <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">Enter the phone number  </dd> :<dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{userDetails.phone}  </dd> }
+            
           </div>
 
           <div className="mt-6 flex items-center justify-end gap-x-6">

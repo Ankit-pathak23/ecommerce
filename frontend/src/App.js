@@ -19,6 +19,10 @@ import ProfileEdit from './Pages/ProfileEdit';
 import Otp from './Pages/Otp';
 import ForgetPassword from './Pages/ForgetPassword';
 import PasswordReset from './Pages/PasswordReset';
+import PaymentOptions from './Pages/PaymentOptions';
+import SavedAddress from './Pages/SavedAddress';
+import AddAddress from './Pages/AddAddress';
+// import PayPalPayment from './Pages/PaymentOptions';
 
 function App() {
   return (
@@ -36,10 +40,12 @@ function App() {
           <Route path='/profile' element={<Profile/>}/>
           <Route path='/profile/edit' element={<ProfileEdit/>}/>
           <Route path='/address' element={<Address/>}/>
+          <Route path='/addaddress' element={<AddAddress/>}/>
           <Route path='/login' element={<Signin />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path='/checkout' element={<Checkout/>}/>
           <Route path='/profile/verify' element={<Otp/>}/>
+          <Route path='/payment' element={<PaymentOptions/>}/>
           <Route path='/profile/forgotpassword' element={<ForgetPassword/>}/>
           <Route path='/profile/resetpassword' element={<PasswordReset/>}/>
         </Route>

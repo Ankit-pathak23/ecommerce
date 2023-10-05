@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserDetails, login } from "../redux/Slice/UserSlice";
 import Loader from "../components/Navigation/Loader";
 import Message from "../components/Navigation/Message";
+import Googelogin from "./Googelogin";
 /*
   This example requires some changes to your config:
   
@@ -136,6 +137,8 @@ export default function Signin() {
               SignUp
             </Link>
           </p>
+          
+          <Googelogin/>
         </div>
       </div>
     </>

@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     ShippingAddress=serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = User
-        fields = ('id','username','email','name','isAdmin','ShippingAddress','phone','image','isverified')
+        fields = ('id','username','email','name','isAdmin','ShippingAddress','phone','image','isverified','imagegoogle')
 
 
     
@@ -84,7 +84,7 @@ class OrderSerializer (serializers.ModelSerializer):
     
     def get_shippingAddress(self,obj):
         try:
-            address= ShippingAddressSerializer(obj.shippingAddress,many=False).data
+            address= ShippingAddressSerializer(obj.address,many=False).data
         except:
             address=False
         return address

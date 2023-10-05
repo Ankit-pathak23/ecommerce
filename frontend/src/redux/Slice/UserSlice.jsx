@@ -46,6 +46,22 @@ export const register = createAsyncThunk('user/register', async ({ name, email, 
 };
 
     const { data } = await axios.post('api/users/register/', { 'name': name, 'email': email, 'password' : password ,'phone' :phone,'image':image}, config);
+    
+    localStorage.setItem('userInfo', JSON.stringify(data));
+
+    return data;
+
+});
+export const googleregister = createAsyncThunk('user/googleregister', async ({name,email,image}) => {
+
+  const config = {
+    headers: {
+        'Content-Type': 'application/json',
+    },
+};
+
+    const { data } = await axios.post('api/users/googleregister/', { 'name': name, 'email': email,'image':image}, config);
+    console.log(data);
     localStorage.setItem('userInfo', JSON.stringify(data));
 
     return data;
@@ -175,6 +191,7 @@ const userSlice = createSlice({
         
       .addCase(login.pending, (state) => {
         state.loading = true;
+        state.error=null
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
@@ -201,8 +218,23 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      .addCase(googleregister.pending, (state) => {
+        state.loading = true;
+        state.error=null
+      })
+      .addCase(googleregister.fulfilled, (state, action) => {
+        state.loading = false;
+        
+        state.userInfo = action.payload;
+        state.error=null
+      })
+      .addCase(googleregister.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
       .addCase(getUserDetails.pending, (state) => {
         state.loading = true;
+        state.error=null
       })
       .addCase(getUserDetails.fulfilled, (state, action) => {
         state.loading = false;
@@ -216,6 +248,7 @@ const userSlice = createSlice({
       })
       .addCase(updateUserProfile.pending, (state) => {
         state.loading = true;
+        state.error=null
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.loading = false;
@@ -229,6 +262,7 @@ const userSlice = createSlice({
       .addCase(addShippingAddress.fulfilled, (state, action) => {
         // Update state with the new shipping address
         state.shippingAddress = action.payload;
+        state.error=null
       })
       .addCase(addShippingAddress.rejected, (state, action) => {
         state.error=action.payload
@@ -246,29 +280,29 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(forgetpassword .pending, (state) => {
+      .addCase(forgetpassword.pending, (state) => {
         state.loading = true;
       })
-      .addCase(forgetpassword .fulfilled, (state, action) => {
+      .addCase(forgetpassword.fulfilled, (state, action) => {
         state.loading = false;
 
         state.error = null;
         state.isforget=true;
       })
-      .addCase(forgetpassword .rejected, (state, action) => {
+      .addCase(forgetpassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(resetPassword .pending, (state) => {
+      .addCase(resetPassword.pending, (state) => {
         state.loading = true;
       })
-      .addCase(resetPassword  .fulfilled, (state, action) => {
+      .addCase(resetPassword.fulfilled, (state, action) => {
         state.loading = false;
 
         state.error = null;
         state.isforget=false;
       })
-      .addCase(resetPassword  .rejected, (state, action) => {
+      .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })

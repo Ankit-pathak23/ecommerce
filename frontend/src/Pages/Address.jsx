@@ -19,11 +19,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { addShippingAddress } from '../redux/Slice/UserSlice';
 import SavedAddress from './SavedAddress';
 import { getUserDetails } from '../redux/Slice/UserSlice';
+import { saveAddressId } from '../redux/Slice/CartSlice'
 
 
 
 export default function Address() {
-  const [name,setName]=useState('');
+const [name,setName]=useState('');
 const [phone,setPhone]=useState('');
 const [country,setCountry]=useState('');
 const [city,setCity]=useState('');
@@ -42,168 +43,97 @@ const [postalCode,setPostalCode]=useState('');
 
 const shippingAddress = userDetails.ShippingAddress
 console.log(shippingAddress);
-  const submitHandler = (e) => {
-      e.preventDefault()
-    dispatch(addShippingAddress({name,phone,country,city,address,postalCode}))
-    if(!error){
-      navigate('/order')
+  // const submitHandler = (e) => {
+  //     e.preventDefault()
+  //   dispatch(addShippingAddress({name,phone,country,city,address,postalCode}))
+  //   if(!error){
+  //     navigate('/address')
+  //   }
+  // }
+  const cartItem= useSelector(state => state.cart)
+   
+  const {cartItems} =cartItem
+ 
+    const submitHandler = (id) => {
+        
+      dispatch(saveAddressId(id));
+       if(cartItems.length===0){
+        navigate('/cart')
+       }
+      else{
+        navigate('/payment')
+      }
+      
     }
-  }
   return (
     <>
-    {shippingAddress.length!==0 && <SavedAddress shippingAddress={shippingAddress}/> }
-    <form className='flex justify-center items-center '>
-      <div className="space-y-12 w-full max-w-md space-y-12">
-        <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Profile</h2>
-         
-
-        <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Personal Information</h2>
-          <p className="mt-1 text-sm leading-6 text-gray-600">Use a permanent address where you can receive mail.</p>
-
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-3">
-              <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-gray-900">
-                Enter the full Name
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="first-name"
-                  id="first-name"
-                  autoComplete="given-name"
-                  required
-                  onChange={(e) => setName(e.target.value)}
-                  value={name}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-4">
-              <label htmlFor="phonenumber" className="block text-sm font-medium leading-6 text-gray-900">
-                Enter the phone number
-              </label>
-              <div className="mt-2">
-                <input
-                  id="number"
-                  name="number"
-                  type="text"
-                  autoComplete="email"
-                  required
-                  onChange={(e) =>setPhone(e.target.value)}
-                  value={phone}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-3">
-              <label htmlFor="country" className="block text-sm font-medium leading-6 text-gray-900">
-                Country
-              </label>
-              <div className="mt-2">
-                <input
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
-                  required
-                  onChange={(e) => setCountry(e.target.value)}
-                  value={country}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="col-span-full">
-              <label htmlFor="street-address" className="block text-sm font-medium leading-6 text-gray-900">
-                Street address
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="street-address"
-                  id="street-address"
-                  autoComplete="street-address"
-                  required
-                  onChange={(e) => setAddress(e.target.value)}
-                  value={address}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-2 sm:col-start-1">
-              <label htmlFor="city" className="block text-sm font-medium leading-6 text-gray-900">
-                City
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="city"
-                  id="city"
-                  autoComplete="address-level2"
-                  required
-                  onChange={(e) => setCity(e.target.value)}
-                  value={city}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            {/* <div className="sm:col-span-2">
-              <label htmlFor="region" className="block text-sm font-medium leading-6 text-gray-900">
-                State / Province
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="region"
-                  id="region"
-                  autoComplete="address-level1"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div> */}
-
-            <div className="sm:col-span-2">
-              <label htmlFor="postal-code" className="block text-sm font-medium leading-6 text-gray-900">
-                ZIP / Postal code
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="postal-code"
-                  id="postal-code"
-                  autoComplete="postal-code"
-                  required
-                  onChange={(e) => setPostalCode(e.target.value)}
-                  value={postalCode}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
+    
+    <div className="bg-white py-24 sm:py-32" >
+    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    {shippingAddress.length!==0 && 
+    shippingAddress.map((address,index) => (
+      <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none" key={address.id}>
+        <div className="p-8 sm:p-10 lg:flex-auto">
+          <h3 className="text-2xl font-bold tracking-tight text-gray-900">Address</h3>
+          <p className="mt-6 text-base leading-7 text-gray-600">
+           Name = {address.name}
+          </p>
+          <p className="mt-6 text-base leading-7 text-gray-600">
+            Street Address = {address.address}
+          </p>
+          <div className="mt-10 flex items-center gap-x-4">
+            <h4 className="flex-none text-sm font-semibold leading-6 text-indigo-600">More Informations</h4>
+            <div className="h-px flex-auto bg-gray-100" />
+          </div>
+          <ul
+            role="list"
+            className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6"
+          >
+            
+              <li className="flex gap-x-3">
+                
+                City = {address.city}
+              </li>
+              <li  className="flex gap-x-3">
+                
+            Phone = {address.phone}
+              </li>
+              <li  className="flex gap-x-3">
+                
+               Postal Code = {address.postalCode}
+              </li>
+              <li  className="flex gap-x-3">
+                
+               Country = {address.country}
+              </li>
+          
+          </ul>
+        </div>
+        <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
+          <div className="rounded-2xl bg-gray-50 py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
+            <div className="mx-auto max-w-xs px-8">
+             
+              
+              <button
+                onClick={() => submitHandler(address.id)}
+                className="mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Continue
+              </button>
+              
             </div>
           </div>
         </div>
-
-       
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-        <Link className="text-sm font-semibold leading-6 text-gray-900" to='/account/login'>
-          login
+      </div>
+       ))
+    }
+    <div className="mt-6 flex items-center justify-end gap-x-6">
+        <Link className="text-sm font-semibold leading-6 text-gray-900" to='/addAddress'>
+          Add Address
         </Link>
-        <button
-          type="submit"
-          onClick={submitHandler}
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Save
-        </button>
-      </div>
-      </div>
+        </div>
     </div>
-      
-    </form>
+  </div>
 
     </>
   )

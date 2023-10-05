@@ -1,17 +1,27 @@
 // import { SortAscendingIcon, UsersIcon } from '@heroicons/react/solid'
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect,useState } from 'react';
-import { fetchLiveSearchResults } from '../../redux/Slice/ProductSlice';
+import { fetchLiveSearchResults,setError } from '../../redux/Slice/ProductSlice';
+
 export default function SearchBaar() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
+  const {error} = useSelector(state=> state.products)
+  
 
   useEffect(() => {
-    if (searchQuery.trim() !== '') {
-      dispatch(fetchLiveSearchResults(searchQuery));
+    if(searchQuery===''){
+      dispatch(setError())
     }
-  }, [searchQuery, dispatch]);
+    if (searchQuery.trim() !== '') {
+      const delayDebounceFn = setTimeout(() => {
+        dispatch(fetchLiveSearchResults(searchQuery));
+      }, 1000)
+      return () => clearTimeout(delayDebounceFn)
+      
+    }
+  }, [searchQuery]);
 
   return (
     <div>
@@ -26,7 +36,7 @@ export default function SearchBaar() {
             name="text"
             id="seacrh"
             className="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
-            placeholder="search Products"
+            placeholder="Search Products"
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>

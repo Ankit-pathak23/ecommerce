@@ -1,162 +1,117 @@
-import React, { useState,useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { createOrder, getOrderDetails } from "../redux/Slice/OrderSlice";
-import { useLocation, useNavigate } from "react-router-dom";
-
+import axios from "axios";
+import { useState } from "react";
+import useRazorpay from "react-razorpay";
 const Checkout = () => {
-    const countries = ["China", "Russia", "UK","India"];
-    const [menu, setMenu] = useState(false);
-    const [country, setCountry] = useState("United States");
-    const dispatch=useDispatch();
-    const navigate=useNavigate()
-    const location=useLocation();
-    const orderCreate=useSelector(state => state.order)
-    const cartItem=useSelector(state => state.cart)
-    const {cartItems} =cartItem
-    // console.log(cartItem);
-    console.log(orderCreate);
-    
-    const{orderDetails,error,loading} = orderCreate
-    console.log(orderDetails);
-    console.log(orderDetails.id);
-
-   
-    const [orderDetailsLoaded, setOrderDetailsLoaded] = useState(false);
-
-    useEffect(() => {
-        const fetchOrderDetails = async () => {
-            if (loading) {
-                await dispatch(getOrderDetails(orderDetails.id));
-                setOrderDetailsLoaded(true);
-            }
-        };
-
-        fetchOrderDetails();
-    }, [loading, orderDetails, dispatch]);
-
-    useEffect(() => {
-        if (orderDetailsLoaded) {
-            const expectedRoute = `/orderdetail/${orderDetails.id}`;
-            
-            // Only navigate if orderDetails are loaded and the current pathname is different from expectedRoute
-            if (Object.keys(orderDetails).length !== 0 && location.pathname !== expectedRoute) {
-                navigate(expectedRoute);
-            }
-        }
-    }, [orderDetailsLoaded, orderDetails, navigate, location]);
-
-    // ... rest of the component ...
-  const price=  cartItems.reduce((acc,item) => acc+item.qty_*item.price, 0).toFixed(2)
-  console.log(price);
-
-    const orderConform= (paymentMethod,isPaid) => {
-        console.log(paymentMethod);
-        console.log(cartItem.address);
-            dispatch(createOrder({
-                  orderItems: cartItem.cartItems,
-                  
-                  paymentMethod: paymentMethod,
-                  isPaid: isPaid,
-                  index:cartItem.address,
-                  totalprice:  price
-              }))
-        
-    }
-    
+    const [Razorpay] = useRazorpay();
+    const [amount, setAmount] = useState(500);
   
-    const changeText = (e) => {
-        setMenu(false);
-        setCountry(e.target.textContent);
-    };
+    // complete order
+    const complete_order = (paymentID, orderID, signature)=>{
+        axios({
+            method: 'post',
+            url: 'http://127.0.0.1:8000/razorpay/order/complete/',
+            data: {
+                "payment_id": paymentID,
+                "order_id": orderID,
+                "signature": signature,
+                "amount": amount
+            }
+        })
+        .then((response)=>{
+            // console.log(response.data);
+        })
+        .catch((error)=>{
+            // console.log(error.response.data);
+        })
+    }
 
-    return (
-        <div className="flex justify-center items-center">
-            <div className="py-16 px-4 md:px-6 2xl:px-0 flex justify-center items-center 2xl:mx-auto 2xl:container">
-                <div className="flex flex-col justify-start items-start w-full space-y-9">
-                    <div className="flex justify-start flex-col items-start space-y-2">
-                        <button className="flex flex-row items-center text-gray-600 hover:text-gray-500 space-x-1">
-                            <svg className="fill-stroke" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.91681 7H11.0835" stroke="currentColor" strokeWidth="0.666667" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M2.91681 7L5.25014 9.33333" stroke="currentColor" strokeWidth="0.666667" strokeLinecap="round" strokeLinejoin="round" />
-                                <path d="M2.91681 7.00002L5.25014 4.66669" stroke="currentColor" strokeWidth="0.666667" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <p className="text-sm leading-none">Back</p>
-                        </button>
-                        <p className="text-3xl lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-800">Checkout</p>
-                        
-                    </div>
+    const razorPay = ()=>{
+        //create order
+        axios({
+            method: 'post',
+            url: 'http://127.0.0.1:8000/razorpay/order/create/',
+            data: {
+                amount: amount,
+                currency: "INR"
+            }
+        })
+        .then((response)=>{
+            console.log(response);
+            // get order id
+            var order_id = response.data.data.id
+            console.log(order_id);
+            
+            // handle payment
+            const options = {
+                key: 'rzp_test_0ZY6EjrHkFQgpY', // Enter the Key ID generated from the Dashboard
+                name: "Acme Corp",
+                description: "Test Transaction",
+                image: "https://example.com/your_logo",
+                order_id: order_id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
+                handler: function (response) {
+                    console.log(response.razorpay_payment_id);
+                    console.log(response.razorpay_order_id);
+                    console.log(response.razorpay_signature);
+                    //complete order
+                    complete_order(
+                        response.razorpay_payment_id,
+                        response.razorpay_order_id,
+                        response.razorpay_signature
+                    )
+                },
+                prefill: {
+                name: "Ankit Pathak",
+                email: "pathakankit2309@gmail.com",
+                contact: "9999999999",
+                },
+                notes: {
+                address: "Razorpay Corporate Office",
+                },
+                theme: {
+                color: "#3399cc",
+                },
+            };
 
-                    <div className="flex flex-col xl:flex-row justify-center xl:justify-between space-y-6 xl:space-y-0 xl:space-x-6 w-full">
-                        
+            const rzp1 = new Razorpay(options);
+            rzp1.on("payment.failed", function (response) {
+                alert(response.error.code);
+                alert(response.error.description);
+                alert(response.error.source);
+                alert(response.error.step);
+                alert(response.error.reason);
+                alert(response.error.metadata.order_id);
+                alert(response.error.metadata.payment_id);
+            });
+            rzp1.open();
+        })
+        .catch((error)=>{
+            console.log(error);
+        })
+    }
 
-                        <div className="p-8 bg-gray-100 flex flex-col lg:w-full xl:w-3/5">
-                            <button onClick={() => orderConform('cash on delevery' ,false)} className="border border-transparent hover:border-gray-300 bg-gray-900 hover:bg-white text-white hover:text-gray-900 flex flex-row justify-center items-center space-x-2 py-4 rounded w-full">
-                                <div>
-                                    
-                                        
-                                </div>
-                                <div>
-                                    <p  className="text-base leading-4">Cash on delevery</p>
-                                </div>
-                            </button>
-
-                            <div className="flex flex-row justify-center items-center mt-6">
-                                <hr className="border w-full" />
-                                <p className="flex flex-shrink-0 px-4 text-base leading-4 text-gray-600">or pay with card</p>
-                                <hr className="border w-full" />
-                            </div>
-
-                       
-
-                            <label className="mt-8 text-base leading-4 text-gray-800">Card details</label>
-                            <div className="mt-2 flex-col">
-                                <div>
-                                    <input required className="border rounded-tl rounded-tr border-gray-300 p-4 w-full text-base leading-4 placeholder-gray-600 text-gray-600" type="email" placeholder="0000 1234 6549 15151" />
-                                </div>
-                                <div className="flex-row flex">
-                                    <input required className="border rounded-bl border-gray-300 p-4 w-full text-base leading-4 placeholder-gray-600 text-gray-600" type="email" placeholder="MM/YY" />
-                                    <input required className="border rounded-br border-gray-300 p-4 w-full text-base leading-4 placeholder-gray-600 text-gray-600" type="email" placeholder="CVC" />
-                                </div>
-                            </div>
-
-                            <label className="mt-8 text-base leading-4 text-gray-800">Name on card</label>
-                            <div className="mt-2 flex-col">
-                                <div>
-                                    <input required className="border rounded border-gray-300 p-4 w-full text-base leading-4 placeholder-gray-600 text-gray-600" type="email" placeholder="Name on card" />
-                                </div>
-                            </div>
-
-                            <label className="mt-8 text-base leading-4 text-gray-800">Country or region</label>
-                            <div className="mt-2 flex-col">
-                                <div className="relative">
-                                    <button className="text-left border rounded-tr rounded-tl border-gray-300 p-4 w-full text-base leading-4 placeholder-gray-600 text-gray-600 bg-white" type="email">
-                                        {country}
-                                    </button>
-                                    <svg onClick={() => setMenu(!menu)} className={"transform  cursor-pointer absolute top-4 right-4 " + (menu ? "rotate-180" : "")} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3.5 5.75L8 10.25L12.5 5.75" stroke="#27272A" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    <div className={"mt-1 absolute z-10 w-full flex bg-gray-50 justify-start flex-col text-gray-600 " + (menu ? "block" : "hidden")}>
-                                        {countries.map((country) => (
-                                            <div key={country} className="cursor-pointer hover:bg-gray-800 hover:text-white px-4 py-2" onClick={changeText}>
-                                                {country}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <input className="border rounded-bl rounded-br border-gray-300 p-4 w-full text-base leading-4 placeholder-gray-600 text-gray-600" type="text" placeholder="ZIP" />
-                            </div>
-
-                            <button onClick= {() =>orderConform('Card' ,  true)}className="mt-8 border border-transparent hover:border-gray-300 bg-gray-900 hover:bg-white text-white hover:text-gray-900 flex justify-center items-center py-4 rounded w-full">
-                                <div>
-                                    <p className="text-base leading-4">Pay </p>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
+    return(
+        <div className="container mt-5 text-center rounded bg-warning border p-5" style={{width:"28%"}}>
+            <h1 className="fw-bolder display-2">₹500</h1>
+            <p>per year</p>
+            <div>
+                <h3 className="fw-semibold">Basic</h3>
+                <div className="text-start mt-3">
+                    <ul style={{fontSize:"14px"}}>
+                        <li>1 custom domain e.g. img.yourdomain.com</li>
+                        <li>Media library backup</li>
+                        <li>Automated image analysis reports with Performance Center</li>
+                        <li>One-time 30 minute consultation with a media optimization expert</li>
+                        <li>Live chat & 12-hr SLA support tickets</li>
+                        <li>5 user accounts with role-based permissions</li>
+                    </ul>
+                </div>
+                <div className="d-grid mt-3">
+                    <button type="button" className="btn btn-light fw-semibold py-3" onClick={razorPay}>Upgrad now</button>
                 </div>
             </div>
         </div>
-    );
+    )
+
 };
 
 export default Checkout;

@@ -20,7 +20,7 @@ const cartItem= useSelector(state => state.cart)
         
       dispatch(saveAddressId(id));
       
-        navigate('/checkout')
+        navigate('/payment')
       
     }
    
